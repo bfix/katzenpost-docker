@@ -8,6 +8,8 @@ FROM golang:trixie AS builder
 
 LABEL author="<ops@cryptonymity.net>"
 
+ENV DEBIAN_FRONTEND=noninteractive
+
 ARG VERSION=main
 
 RUN \
@@ -21,6 +23,14 @@ RUN \
 FROM debian:trixie AS deploy
 
 COPY --from=builder /go/katzenpost/cmd/kpclientd/kpclientd /usr/bin/kpclientd
+
+RUN \
+	apt update && \
+	apt install -y --no-install-recommends \
+		adduser \
+		&& \
+	apt clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ARG uid=1000
 ARG gid=1000

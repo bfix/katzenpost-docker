@@ -23,6 +23,7 @@ FROM debian:trixie AS deploy
 
 RUN apt update && \
     apt-get install -y --no-install-recommends \
+    adduser \
     ca-certificates \
     tzdata && \
     update-ca-certificates && \

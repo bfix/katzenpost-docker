@@ -24,6 +24,14 @@ COPY --from=builder /go/katzenpost/cmd/server/server /usr/bin/server
 
 EXPOSE 8181
 
+RUN \
+	apt update && \
+	apt install -y --no-install-recommends \
+		adduser \
+		&& \
+	apt clean && \
+	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
 ARG uid=1000
 ARG gid=1000
 
