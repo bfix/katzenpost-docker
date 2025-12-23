@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export PATH=${PATH}:${HOME}/.local/bin
+cd ${HOME}/katzenqt
+. .venv/bin/activate
+uv run katzenqt
+
