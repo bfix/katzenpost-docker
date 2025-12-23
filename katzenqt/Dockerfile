@@ -1,3 +1,9 @@
+
+#############################################################
+# Dockerfile to build  >Y< Katzenpost Qt6 client.
+# Copyright (c) 2025-present, Bernd Fix. All rights reserved.
+#############################################################
+
 FROM debian:trixie
 
 LABEL author="<ops@cryptonymity.net>"
@@ -46,11 +52,6 @@ RUN \
 	echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user && \
 	chmod 0640 /etc/sudoers.d/user
 
-COPY run-client /home/user/run-client
-
-RUN \
-	chown -R user:user /home/user
-
 USER user
 ENV HOME=/home/user
 
@@ -63,6 +64,8 @@ RUN \
 	uv venv .venv && \
 	uv pip install . && \
 	uv pip install -U pytest
+
+COPY run-client ${HOME}/run-client
 
 CMD ["/home/user/run-client"]
 
