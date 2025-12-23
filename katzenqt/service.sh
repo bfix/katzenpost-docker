@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NAME=katzenpost/qt
+CNT=kp-qt
 KP_SOCK=/srv/katzenpost/clientd/data/kp.sock
 
 CMD=${1:-start}
@@ -12,11 +13,11 @@ case ${CMD} in
     start)
         MODE="-d"
         EXEC=""
-        LOG="docker logs -f ${NAME}"
+        LOG="docker logs -f ${CNT}"
         ;;
     stop)
-        docker stop ${NAME}
-        docker rm ${NAME}
+        docker stop ${CNT}
+        docker rm ${CNT}
         exit
         ;;
     test)
@@ -31,7 +32,7 @@ case ${CMD} in
 esac
 
 docker run ${MODE} \
-    --name kp-qt -h kp-qt \
+    --name ${CNT} -h ${CNT} \
 	--ipc=host \
 	-e PULSE_SERVER=unix:/run/user/$(id -u)/pulse/native \
 	-e DISPLAY=${DISPLAY} \

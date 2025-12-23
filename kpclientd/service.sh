@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NAME=katzenpost/clientd
+CNT=kp-clientd
 
 CMD=${1:-start}
 case ${CMD} in
@@ -11,11 +12,11 @@ case ${CMD} in
         ;;
     start)
         MODE="-d --restart=unless-stopped"
-        LOG="docker logs -f ${NAME}"
+        LOG="docker logs -f ${CNT}"
         ;;
     stop)
-        docker stop ${NAME}
-        docker rm ${NAME}
+        docker stop ${CNT}
+        docker rm ${CNT}
         exit
         ;;
     test)
@@ -30,7 +31,7 @@ case ${CMD} in
 esac
 
 docker run ${MODE} \
-    --name kp-clientd -h kp-clientd \
+    --name ${CNT} -h ${CNT} \
     -v $(pwd)/conf:/conf \
     -v $(pwd)/data:/var/lib/katzenpost \
     ${NAME} ${EXEC}

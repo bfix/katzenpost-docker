@@ -1,6 +1,7 @@
 #!/bin/bash
 
 NAME=katzenpost/authority
+CNT=kp-dirauth
 
 CMD=${1:-start}
 case ${CMD} in
@@ -17,11 +18,11 @@ case ${CMD} in
     start)
         MODE="-d --restart=unless-stopped"
         EXEC=""
-        LOG="docker logs -f ${NAME}"
+        LOG="docker logs -f ${CNT}"
         ;;
     stop)
-        docker stop ${NAME}
-        docker rm ${NAME}
+        docker stop ${CNT}
+        docker rm ${CNT}
         exit
         ;;
     test)
@@ -36,7 +37,7 @@ case ${CMD} in
 esac
 
 docker run ${MODE} \
-    --name kp-dirauth -h kp-dirauth \
+    --name ${CNT} -h ${CNT} \
     -p 0.0.0.0:28181:8181 \
     -v $(pwd)/conf:/conf \
     -v $(pwd)/data:/var/lib/katzenpost \
