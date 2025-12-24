@@ -10,20 +10,9 @@ case ${CMD} in
         docker build -t ${NAME} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
         exit
         ;;
-    start)
-        MODE="-d"
-        EXEC=""
-        LOG="docker logs -f ${CNT}"
-        ;;
-    stop)
-        docker stop ${CNT}
-        docker rm ${CNT}
-        exit
-        ;;
-    test)
+    run)
         MODE="-ti --rm"
-        EXEC="bash"
-        LOG=""
+        EXEC="$2"
         ;;
     *)
         echo "unknown command"
@@ -42,6 +31,3 @@ docker run ${MODE} \
     -v $(pwd)/data:/home/user/.local/share/katzenqt \
     -v ${KP_SOCK}:/home/user/katzenqt/kp.sock \
     ${NAME} ${EXEC}
-
-${LOG}
-
