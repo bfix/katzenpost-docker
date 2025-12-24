@@ -106,6 +106,7 @@ git commit -a
 git push
 ```
 
+Ask a Katzenpost maintainer to add your mix to the mixnet topology.
 Your Mix node will be added to the live network as soon as directory
 authority servers will refresh their configuration to include your mix.
 
@@ -121,7 +122,101 @@ the listening port matches the value in the `Addresses` configuration.
 
 ## Directory Authority server
 
-t.b.d.
+### Preparing the host filesystem
+
+```bash
+./service.sh prep
+```
+
+### Building the Docker image
+
+```bash
+./service.sh build [version]
+```
+
+You can add a specific version number like `v0.0.67` as a second argument
+to build the image based on that version. If not specified it will use
+tip of the main branch.
+
+### Create a configuration file for the DirAuth server
+
+You need to follow the instructions in the Katzenpost
+[Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
+create a configuration file. You also need access to the `namenlos` repo.
+
+Create a new file named `<yourname>-pq-authority.toml` in
+`<namenlos.repo>/configs/SSOT/authority_configs` based the following template.
+Change `Identifier` (the server name) and the IP/port setting in
+`Addresses` based on your needs:
+
+```toml
+[Server]
+Identifier = "<yourname>"
+PKISignatureScheme = "Ed25519 Sphincs+"
+WireKEM = "KYBER768-X25519"
+Addresses = [ "tcp://<public-ip>:<port>" ]
+BindAddresses = [ "tcp://0.0.0.0:8181" ]
+DataDir = "/var/lib/katzenpost"
+
+[Logging]
+Disable = false
+File = ""
+Level = "NOTICE"
+```
+
+Create a new file named `<yourname>` in `<namenlos.repo>/configs/SSOT/authorities`
+based the following template. Again change `Identifier` (the server name) and
+the IP/port setting in `Addresses` based on your needs; they should match the
+settings in the previous file.
+
+```toml
+Identifier = "<yourname>"
+PKISignatureScheme = "Ed25519 Sphincs+"
+WireKEMScheme = "KYBER768-X25519"
+Addresses = ["tcp://<public-ip>:<port>"]
+BindAddresses = ["tcp://0.0.0.0:8181"]
+IdentityPublicKey = ""
+LinkPublicKey = ""
+```
+
+In the `namenlos` repo, change into the `configs` directory and run `make`.
+Copy the generated configuration file
+`<namelos.repo>/configs/<yourname>-pq-authority.toml` to
+`conf/authority.toml` in this repo.
+
+### Generating and extracting keys
+
+Run the server to generate the keys:
+
+```bash
+./service.sh genkeys
+```
+
+Check that keys (`*.pem`) have been created in the `data/` directory.
+Insert the public identity key and the public link key into the empty
+slots in `<namenlos.repo>/configs/SSOT/authorities/<yourname>`.
+
+### Update the 'namenlos' repo
+
+```bash
+cd <namenlos.repo>/configs
+make
+git commit -a
+git push
+```
+
+Your DirAuth node will be added to the live network as soon as the other
+directory authority servers will refresh their configuration.
+
+### Starting/stopping the server
+
+```bash
+./service.sh start [ListenAddr]
+./service.sh stop
+```
+
+If you do not specify a `ListenAddr` it will default to `0.0.0.0:28181`. Make sure
+the listening port matches the value in the `Addresses` configuration.
 
 # Katzenpost clients
 
@@ -130,7 +225,7 @@ t.b.d.
 To use the Katzenpost network for client applications you first need to run
 a local daemon. The daemon handles the communication with the Katzenpost
 network on behalf of client applications. Clients use Unix sockets or TCP
-ports to talk the daemon.
+ports to talk to the daemon.
 
 ### Preparing the host filesystem
 
@@ -175,12 +270,8 @@ ListenAddress = "/var/lib/katzenpost/kp.sock"
 ### Building the Docker image
 
 ```bash
-./client.sh build [version]
+./client.sh build
 ```
-
-You can add a specific version number like `v0.0.67` as a second argument
-to build the image based on that version. If not specified it will use
-tip of the main branch.
 
 ### Creating a configuration file
 

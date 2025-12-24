@@ -8,6 +8,11 @@ LISTEN=${2:-0.0.0.0:28181}
 
 CMD=${1:-start}
 case ${CMD} in
+    prep)
+        mkdir {conf,data}
+        chmod 700 data
+        exit
+        ;;
     build)
         [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
         docker build -t ${NAME} ${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
