@@ -17,7 +17,6 @@ RUN \
 		ca-certificates \
 		git \
 		libxcb-cursor-dev \
-		libgl1 \
 		libegl1 \
 		libpulse0 \
 		libfontconfig \
@@ -31,10 +30,11 @@ RUN \
 		python3-venv \
 		x11-utils \
 		qt6-qpa-plugins \
-		qt6-base-examples \
 		&& \
 	apt clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+COPY pulse-client.conf /etc/pulse/client.conf
 
 ARG uid=1000
 ARG gid=1000
@@ -48,7 +48,7 @@ RUN \
 		--quiet \
 		user > /dev/null 2>&1 && \
 	echo "user:test" | chpasswd && \
-	usermod -aG sudo user && \
+	usermod -aG sudo,video,plugdev user && \
 	echo "user ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/user && \
 	chmod 0640 /etc/sudoers.d/user
 
