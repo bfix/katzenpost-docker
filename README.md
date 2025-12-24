@@ -103,7 +103,7 @@ Address = "/home/user/katzenqt/kp.sock"
 on certain Nvidia graphic cards. The window for KatzenQt might show up and the
 controls in the systray look and work fine, but no widgets are drawn in the
 window. If you encounter this problem and can solve the issues for your Nvidia
-card, please give a feedback to `ops@cryptonymity.org`.
+card, please give a feedback to `ops@cryptonymity.net`.
 
 # Katzenpost servers (Mixnet nodes)
 
