@@ -25,12 +25,16 @@ SPDX-License-Identifier: AGPL3.0-or-later
 
 # Katzenpost clients
 
-## Client daemon
+## Client daemon (kpclientd)
 
 To use the Katzenpost network from client applications you first need to run
 a local daemon. The daemon handles the communication with the Katzenpost
 network on behalf of client applications. Clients use Unix sockets or TCP
 ports to talk to the daemon.
+
+```bash
+cd kpclientd
+```
 
 ### Preparing the host filesystem
 
@@ -69,6 +73,13 @@ you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
 
 ## KatzenQt chat application
+
+The KatzenQt chat application enables encrypted group chats over the Katzenpost
+mixnet. It is currently the only client application available for Katzenpost.
+
+```bash
+cd katzenqt
+```
 
 ### Preparing the host filesystem
 
@@ -117,6 +128,10 @@ to learn about setting up Katzenpost servers.
 on the real network.
 
 ## Mix server
+
+```bash
+cd mix
+```
 
 ### Preparing the host filesystem
 
@@ -207,6 +222,10 @@ you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
 
 ## Directory Authority server
+
+```bash
+cd authority
+```
 
 ### Preparing the host filesystem
 
