@@ -23,6 +23,88 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: AGPL3.0-or-later
 
+# Katzenpost clients
+
+## Client daemon
+
+To use the Katzenpost network from client applications you first need to run
+a local daemon. The daemon handles the communication with the Katzenpost
+network on behalf of client applications. Clients use Unix sockets or TCP
+ports to talk to the daemon.
+
+### Preparing the host filesystem
+
+```bash
+./service.sh prep
+```
+
+### Building the Docker image
+
+```bash
+./service.sh build [version]
+```
+
+You can add a specific version number like `v0.0.67` as a second argument
+to build the image based on that version. If not specified it will use
+tip of the main branch.
+
+### Creating a configuration file
+
+Copy the file https://github.com/katzenpost/katzenqt/blob/main/config/client2.toml
+to `conf/client.toml`. Edit the file for the following settings:
+
+```toml
+ListenNetwork = "unix"
+ListenAddress = "/var/lib/katzenpost/kp.sock"
+```
+
+### Starting/stopping the daemon
+
+```bash
+./service.sh (start|stop)
+```
+
+Starting the client will begin to show the log output from the running service;
+you can terminate it with `^C` any time. This will only terminate the log
+output but not the service itself. Run `./service.sh stop` to stop the service.
+
+## KatzenQt chat application
+
+### Preparing the host filesystem
+
+```bash
+./client.sh prep
+```
+
+### Building the Docker image
+
+```bash
+./client.sh build
+```
+
+### Creating a configuration file
+
+From https://github.com/katzenpost/katzenqt/tree/main/config copy the files
+`alembic.ini` and `thinclient.toml` to the local `conf` folder. Edit the
+`thinclient.toml` file for the following settings:
+
+```toml
+Network = "unix"
+Address = "/home/user/katzenqt/kp.sock"
+```
+
+### Running KatzenQt
+
+```bash
+./client.sh run
+```
+
+**N.B.:** KatzenQt uses Qt6, and using Qt6 within Docker can result in problems
+on certain Nvidia graphic cards. The window for KatzenQt might show up and the
+controls in the systray look and work fine, but no widgets are drawn in the
+window. If you encounter this problem and can solve the issues for your Nvidia
+card, please give a feedback to `ops@cryptonymity.org`.
+
 # Katzenpost servers (Mixnet nodes)
 
 ## Prerequisites
@@ -119,6 +201,10 @@ authority servers will refresh their configuration to include your mix.
 
 If you do not specify a `ListenAddr` it will default to `0.0.0.0:18181`. Make sure
 the listening port matches the value in the `Addresses` configuration.
+
+Starting the server will begin to show the log output from the running service;
+you can terminate it with `^C` any time. This will only terminate the log
+output but not the service itself. Run `./service.sh stop` to stop the service.
 
 ## Directory Authority server
 
@@ -218,80 +304,6 @@ directory authority servers will refresh their configuration.
 If you do not specify a `ListenAddr` it will default to `0.0.0.0:28181`. Make sure
 the listening port matches the value in the `Addresses` configuration.
 
-# Katzenpost clients
-
-## Client daemon
-
-To use the Katzenpost network for client applications you first need to run
-a local daemon. The daemon handles the communication with the Katzenpost
-network on behalf of client applications. Clients use Unix sockets or TCP
-ports to talk to the daemon.
-
-### Preparing the host filesystem
-
-```bash
-./service.sh prep
-```
-
-### Building the Docker image
-
-```bash
-./service.sh build [version]
-```
-
-You can add a specific version number like `v0.0.67` as a second argument
-to build the image based on that version. If not specified it will use
-tip of the main branch.
-
-### Creating a configuration file
-
-Copy the file https://github.com/katzenpost/katzenqt/blob/main/config/client2.toml
-to `conf/client.toml`. Edit the file for the following settings:
-
-```toml
-ListenNetwork = "unix"
-ListenAddress = "/var/lib/katzenpost/kp.sock"
-```
-
-### Starting/stopping the daemon
-
-```bash
-./service.sh (start|stop)
-```
-
-## KatzenQt chat application
-
-### Preparing the host filesystem
-
-```bash
-./client.sh prep
-```
-
-### Building the Docker image
-
-```bash
-./client.sh build
-```
-
-### Creating a configuration file
-
-From https://github.com/katzenpost/katzenqt/tree/main/config copy the files
-`alembic.ini` and `thinclient.toml` to the local `conf` folder. Edit the
-`thinclient.toml` file for the following settings:
-
-```toml
-Network = "unix"
-Address = "/home/user/katzenqt/kp.sock"
-```
-
-### Running KatzenQt
-
-```bash
-./client.sh run
-```
-
-**N.B.:** KatzenQt uses Qt6, and using Qt6 within Docker can result in problems
-on certain Nvidia graphic cards. The window for KatzenQt might show up and the
-controls in the systray look and work fine, but no widgets are drawn in the
-window. If you encounter this problem and can solve the issues for your Nvidia
-card, please give a feedback to `ops@cryptonymity.org`.
+Starting the server will begin to show the log output from the running service;
+you can terminate it with `^C` any time. This will only terminate the log
+output but not the service itself. Run `./service.sh stop` to stop the service.
