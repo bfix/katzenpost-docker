@@ -1,10 +1,17 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 NAME=katzenpost/clientd
 CNT=kp-clientd
 
 CMD=${1:-start}
 case ${CMD} in
+    prep)
+        mkdir {conf,data}
+        chmod 700 data
+        exit
+        ;;
     build)
         [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
         docker build -t ${NAME} ${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .

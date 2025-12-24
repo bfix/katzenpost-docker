@@ -1,10 +1,18 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 NAME=katzenpost/mix
 CNT=kp-mix
+LISTEN=${2:-0.0.0.0:18181}
 
 CMD=${1:-start}
 case ${CMD} in
+    prep)
+        mkdir {conf,data}
+        chmod 700 data
+        exit
+        ;;
     build)
         [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
         docker build -t ${NAME} ${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
@@ -38,7 +46,7 @@ esac
 
 docker run ${MODE} \
     --name ${CNT} -h ${CNT} \
-    -p 0.0.0.0:18181:8181 \
+    -p ${LISTEN}:8181 \
     -v $(pwd)/conf:/conf \
     -v $(pwd)/data:/var/lib/katzenpost \
     ${NAME} ${EXEC}

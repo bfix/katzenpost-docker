@@ -1,7 +1,10 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 NAME=katzenpost/authority
 CNT=kp-dirauth
+LISTEN=${2:-0.0.0.0:28181}
 
 CMD=${1:-start}
 case ${CMD} in
@@ -38,7 +41,7 @@ esac
 
 docker run ${MODE} \
     --name ${CNT} -h ${CNT} \
-    -p 0.0.0.0:28181:8181 \
+    -p ${LISTEN}:8181 \
     -v $(pwd)/conf:/conf \
     -v $(pwd)/data:/var/lib/katzenpost \
     ${NAME} ${EXEC}

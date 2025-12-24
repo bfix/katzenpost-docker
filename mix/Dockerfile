@@ -47,5 +47,5 @@ RUN \
 USER user
 ENV HOME=/home/user
 
-CMD ["/usr/bin/server","-f","/conf/katzenpost.toml"]
+CMD ["/usr/bin/server","-f","/conf/mix.toml"]
 

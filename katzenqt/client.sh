@@ -1,11 +1,18 @@
 #!/bin/bash
 
+cd $(dirname "$0")
+
 NAME=katzenpost/qt
 CNT=kp-qt
-KP_SOCK=/srv/katzenpost/clientd/data/kp.sock
+KP_SOCK=$(realpath ../kpclientd/data/kp.sock)
 
 CMD=${1:-start}
 case ${CMD} in
+    prep)
+        mkdir {conf,data}
+        chmod 700 data
+        exit
+        ;;
     build)
         docker build -t ${NAME} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
         exit
