@@ -27,7 +27,7 @@ case ${CMD} in
         wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/alembic.ini -O conf/alembic.ini
         wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/thinclient.toml -O - \
             | sed -e 's%Address = "@katzenpost"%Address = "/home/user/katzenqt/kp.sock"%' \
-            > conf/thinclient.toml.toml
+            > conf/thinclient.toml
         exit
         ;;
     run)
