@@ -36,30 +36,22 @@ ports to talk to the daemon.
 cd kpclientd
 ```
 
-### Preparing the host filesystem
-
-```bash
-./service.sh prep
-```
-
-### Building the Docker image
+### Building the client daemon
 
 ```bash
 ./service.sh build [version]
 ```
 
-You can add a specific version number like `v0.0.67` as a second argument
-to build the image based on that version. If not specified it will use
-tip of the main branch.
+You can add a specific version number like `v0.0.67` as a second argument to
+the build script. If not specified, tip of the main branch will be used.
 
-### Creating a configuration file
+If the above build fails, you should run the build steps separately to identify
+the problem:
 
-Copy the file https://github.com/katzenpost/katzenqt/blob/main/config/client2.toml
-to `conf/client.toml`. Edit the file for the following settings:
-
-```toml
-ListenNetwork = "unix"
-ListenAddress = "/var/lib/katzenpost/kp.sock"
+```bash
+./service.sh prep             # Preparing the host filesystem
+./service.sh image [version]  # Building the Docker image
+./service.sh config           # Creating configuration file
 ```
 
 ### Starting/stopping the daemon
@@ -81,27 +73,19 @@ mixnet. It is currently the only client application available for Katzenpost.
 cd katzenqt
 ```
 
-### Preparing the host filesystem
-
-```bash
-./client.sh prep
-```
-
-### Building the Docker image
+### Building the KatzenQt client
 
 ```bash
 ./client.sh build
 ```
 
-### Creating a configuration file
+If the above build fails, you should run the build steps separately to identify
+the problem:
 
-From https://github.com/katzenpost/katzenqt/tree/main/config copy the files
-`alembic.ini` and `thinclient.toml` to the local `conf` folder. Edit the
-`thinclient.toml` file for the following settings:
-
-```toml
-Network = "unix"
-Address = "/home/user/katzenqt/kp.sock"
+```bash
+./client.sh prep      # Preparing the host filesystem
+./client.sh image     # Building the Docker image
+./client.sh config    # Creating configuration file
 ```
 
 ### Running KatzenQt

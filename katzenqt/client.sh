@@ -8,18 +8,36 @@ KP_SOCK=$(realpath ../kpclientd/data/kp.sock)
 
 CMD=${1:-start}
 case ${CMD} in
+    build)
+        ./$0 prep
+        ./$0 image
+        ./$0 config
+        exit
+        ;;
     prep)
         mkdir {conf,data}
         chmod 700 data
         exit
         ;;
-    build)
+    image)
         docker build -t ${NAME} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+        exit
+        ;;
+    config)
+        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/alembic.ini -O conf/alembic.ini
+        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/thinclient.toml -O - \
+            | sed -e 's%Address = "@katzenpost"%Address = "/home/user/katzenqt/kp.sock"%' \
+            > conf/thinclient.toml.toml
         exit
         ;;
     run)
         MODE="-ti --rm"
         EXEC="$2"
+        ;;
+    clean)
+        docker rmi ${CNT}
+        rm -rf {conf,data}
+        exit
         ;;
     *)
         echo "unknown command"

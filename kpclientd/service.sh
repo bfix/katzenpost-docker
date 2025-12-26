@@ -7,14 +7,26 @@ CNT=kp-clientd
 
 CMD=${1:-start}
 case ${CMD} in
+    build)
+        ./$0 prep
+        ./$0 image
+        ./$0 config
+        exit
+        ;;
     prep)
         mkdir {conf,data}
         chmod 700 data
         exit
         ;;
-    build)
+    image)
         [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
         docker build -t ${NAME} ${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+        exit
+        ;;
+    config)
+        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/client2.toml -O - \
+            | sed -e 's%ListenAddress = "@katzenpost"%ListenAddress = "/var/lib/katzenpost/kp.sock"%' \
+            > conf/client.toml
         exit
         ;;
     start)
@@ -30,6 +42,12 @@ case ${CMD} in
         MODE="-ti --rm"
         EXEC="bash"
         LOG=""
+        ;;
+    clean)
+        ./$0 stop
+        docker rmi ${CNT}
+        rm -rf {conf,data}
+        exit
         ;;
     *)
         echo "unknown command"
