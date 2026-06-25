@@ -55,10 +55,13 @@ RUN \
 USER user
 ENV HOME=/home/user
 
+ARG VERSION=main
+
 RUN \
     cd ${HOME} && \
     git clone https://github.com/katzenpost/katzenqt && \
     cd katzenqt && \
+    git checkout ${VERSION} && \
 	pipx install -f uv && \
 	export PATH=${PATH}:${HOME}/.local/bin && \
 	uv venv .venv && \

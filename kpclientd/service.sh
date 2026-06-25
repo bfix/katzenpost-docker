@@ -5,60 +5,57 @@ cd $(dirname "$0")
 NAME=katzenpost/clientd
 CNT=kp-clientd
 
+function run() {
+    docker run ${MODE} \
+        --name ${CNT} -h ${CNT} \
+        -v $(pwd)/conf:/conf \
+        -v $(pwd)/data:/var/lib/katzenpost \
+        -v $(pwd)/logs:/var/log/katzenpost \
+        ${NAME} ${EXEC}
+}
+
 CMD=${1:-start}
+VERSION=${2:-main}
 case ${CMD} in
     build)
         ./$0 prep
         ./$0 image
         ./$0 config
-        exit
         ;;
     prep)
-        mkdir {conf,data}
+        mkdir {conf,data,log}
         chmod 700 data
-        exit
         ;;
     image)
-        [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
-        docker build -t ${NAME} ${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
-        exit
+        docker build -t ${NAME} --build-arg VERSION=${VERSION} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
         ;;
     config)
-        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/client2.toml -O - \
-            | sed -e 's%ListenAddress = "@katzenpost"%ListenAddress = "/var/lib/katzenpost/kp.sock"%' \
+        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/client.toml -O - \
+            | sed -e 's%Address = "@katzenpost"%Address = "/var/lib/katzenpost/kp.sock"%' \
             > conf/client.toml
-        exit
         ;;
     start)
         MODE="-d --restart=unless-stopped"
-        LOG="docker logs -f ${CNT}"
+        EXEC=""
+        run
+        docker logs -f ${CNT}
         ;;
     stop)
         docker stop ${CNT}
         docker rm ${CNT}
-        exit
         ;;
     test)
         MODE="-ti --rm"
         EXEC="bash"
-        LOG=""
+        run
         ;;
     clean)
         ./$0 stop
         docker rmi ${CNT}
-        rm -rf {conf,data}
-        exit
+        rm -rf {conf,data,logs}
         ;;
     *)
         echo "unknown command"
         exit 1
         ;;
 esac
-
-docker run ${MODE} \
-    --name ${CNT} -h ${CNT} \
-    -v $(pwd)/conf:/conf \
-    -v $(pwd)/data:/var/lib/katzenpost \
-    ${NAME} ${EXEC}
-
-${LOG}
