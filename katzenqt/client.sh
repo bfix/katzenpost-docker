@@ -17,6 +17,7 @@ function run() {
         -v /run/user/$(id -u)/pulse:/run/user/1000/pulse \
         -v $(pwd)/conf:/home/user/katzenqt/config \
         -v $(pwd)/data:/home/user/.local/share/katzenqt \
+        -v $(pwd)/log:/var/log/katzenpost \
         -v ${KP_SOCK}:/home/user/katzenqt/kp.sock \
         ${NAME} ${EXEC}
 }
@@ -30,7 +31,7 @@ case ${CMD} in
         ./$0 config
         ;;
     prep)
-        mkdir {conf,data,logs}
+        mkdir {conf,data,log}
         chmod 700 data
         ;;
     image)
