@@ -23,7 +23,7 @@ case ${CMD} in
         ./$0 config
         ;;
     prep)
-        mkdir {conf,data,log}
+        mkdir -p {conf,data,log}
         chmod 700 data
         ;;
     image)
@@ -38,6 +38,8 @@ case ${CMD} in
         MODE="-d --restart=unless-stopped"
         EXEC=""
         run
+        ;&
+    logs)
         docker logs -f ${CNT}
         ;;
     stop)

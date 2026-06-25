@@ -48,6 +48,19 @@ case ${CMD} in
         EXEC="$2"
         run
         ;;
+    start)
+        MODE="-d --restart unless-stopped"
+        EXEC="$2"
+        run &
+        sleep 2s
+        ;&
+    logs)
+        docker logs -f ${CNT}
+        ;;
+    stop)
+        docker stop ${CNT}
+        docker rm ${CNT}
+        ;;
     clean)
         docker rmi ${CNT}
         rm -rf {conf,data,logs}
