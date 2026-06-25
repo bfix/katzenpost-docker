@@ -66,7 +66,8 @@ RUN \
 	export PATH=${PATH}:${HOME}/.local/bin && \
 	uv venv .venv && \
 	uv pip install . && \
-	uv pip install -U pytest
+	uv pip install -U pytest && \
+	uv sync
 
 COPY run-client ${HOME}/run-client
 
