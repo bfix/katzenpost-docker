@@ -60,9 +60,15 @@ the problem:
 ./service.sh (start|stop)
 ```
 
-Starting the client will begin to show the log output from the running service;
+Starting kpclientd will begin to show the log output from the running service;
 you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
+
+To follow the log output again use:
+
+```bash
+./service.sh logs
+```
 
 ## KatzenQt chat application
 
@@ -90,15 +96,39 @@ the problem:
 
 ### Running KatzenQt
 
-```bash
-./client.sh run
-```
-
 **N.B.:** KatzenQt uses Qt6, and using Qt6 within Docker can result in problems
 on certain Nvidia graphic cards. The window for KatzenQt might show up and the
 controls in the systray look and work fine, but no widgets are drawn in the
 window. If you encounter this problem and can solve the issues for your Nvidia
 card, please give a feedback to `ops@cryptonymity.net`.
+
+#### ...in foreground
+
+```bash
+./client.sh run
+```
+
+Starting katzenqt will begin to show the log output from the running service.
+If you terminate the output with `^C`, it will also terminate the client.
+
+#### ... in background
+
+```bash
+./client.sh start
+```
+
+Behaves like the foreground mode, but terminating the log output does not
+terminate the client. If you want to continue show log out (again), use:
+
+```bash
+./client.sh logs
+```
+
+To stop the client, run
+
+```bash
+./client.sh stop
+```
 
 # Katzenpost servers (Mixnet nodes)
 
