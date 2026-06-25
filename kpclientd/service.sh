@@ -10,7 +10,7 @@ function run() {
         --name ${CNT} -h ${CNT} \
         -v $(pwd)/conf:/conf \
         -v $(pwd)/data:/var/lib/katzenpost \
-        -v $(pwd)/logs:/var/log/katzenpost \
+        -v $(pwd)/log:/var/log/katzenpost \
         ${NAME} ${EXEC}
 }
 
