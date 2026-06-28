@@ -35,6 +35,8 @@ case ${CMD} in
         MODE="-d --restart=unless-stopped"
         EXEC=""
         run
+        ;&
+    logs)
         LOG="docker logs -f ${CNT}"
         ;;
     stop)
