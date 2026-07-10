@@ -15,7 +15,7 @@ function run() {
         -e QT_QPA_PLATFORM=xcb \
         -v /tmp/.X11-unix:/tmp/.X11-unix \
         -v /run/user/$(id -u)/pulse:/run/user/1000/pulse \
-        -v $(pwd)/conf:/home/user/katzenqt/config \
+        -v $(pwd)/conf:/home/user/katzenqt/src/katzenqt/data \
         -v $(pwd)/data:/home/user/.local/share/katzenqt \
         -v $(pwd)/logs:/var/log/katzenpost \
         -v ${KP_SOCK}:/home/user/katzenqt/kp.sock \
