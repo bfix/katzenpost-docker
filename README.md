@@ -23,9 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: AGPL3.0-or-later
 
-# Katzenpost clients
+## Katzenpost clients
 
-## Client daemon (kpclientd)
+### Client daemon (kpclientd)
 
 To use the Katzenpost network from client applications you first need to run
 a local daemon. The daemon handles the communication with the Katzenpost
@@ -36,7 +36,7 @@ ports to talk to the daemon.
 cd kpclientd
 ```
 
-### Building the client daemon
+#### Building the client daemon
 
 ```bash
 ./service.sh build [version]
@@ -54,7 +54,7 @@ the problem:
 ./service.sh config           # Creating configuration file
 ```
 
-### Starting/stopping the daemon
+#### Starting/stopping the daemon
 
 ```bash
 ./service.sh (start|stop)
@@ -70,7 +70,7 @@ To follow the log output again use:
 ./service.sh logs
 ```
 
-## KatzenQt chat application
+### KatzenQt chat application
 
 The KatzenQt chat application enables encrypted group chats over the Katzenpost
 mixnet. It is currently the only client application available for Katzenpost.
@@ -79,7 +79,7 @@ mixnet. It is currently the only client application available for Katzenpost.
 cd katzenqt
 ```
 
-### Building the KatzenQt client
+#### Building the KatzenQt client
 
 ```bash
 ./client.sh build [version]
@@ -94,7 +94,7 @@ the problem:
 ./client.sh config           # Creating configuration file
 ```
 
-### Running KatzenQt
+#### Running KatzenQt
 
 **N.B.:** KatzenQt uses Qt6, and using Qt6 within Docker can result in problems
 on certain Nvidia graphic cards. The window for KatzenQt might show up and the
@@ -102,7 +102,7 @@ controls in the systray look and work fine, but no widgets are drawn in the
 window. If you encounter this problem and can solve the issues for your Nvidia
 card, please give a feedback to `ops@cryptonymity.net`.
 
-#### ...in foreground
+##### ...in foreground
 
 ```bash
 ./client.sh run
@@ -111,7 +111,7 @@ card, please give a feedback to `ops@cryptonymity.net`.
 Starting katzenqt will begin to show the log output from the running service.
 If you terminate the output with `^C`, it will also terminate the client.
 
-#### ... in background
+##### ... in background
 
 ```bash
 ./client.sh start
@@ -130,9 +130,9 @@ To stop the client, run
 ./client.sh stop
 ```
 
-# Katzenpost servers (Mixnet nodes)
+## Katzenpost servers (Mixnet nodes)
 
-## Prerequisites
+### Prerequisites
 
 * Read at least the
 [Admin guide](https://katzenpost.network/docs/admin_guide/)
@@ -141,19 +141,33 @@ to learn about setting up Katzenpost servers.
 * Request access to the `namenlos` git repo if you want to run servers
 on the real network.
 
-## Mix server
+### Mix server
 
 ```bash
 cd mix
 ```
 
-### Preparing the host filesystem
+#### Customizing the the mix service parameters
+
+You can customize the service parameters at the beginning of `service.sh`:
+
+```bash
+NAME=katzenpost/mix
+CNT=kp-mix
+LISTEN=${2:-0.0.0.0:18181}
+```
+
+* `NAME` is the name of the generated Docker image
+* `CNT` is the name for the running container
+* `LISTEN` is the bind address the service will listen at
+
+#### Preparing the host filesystem
 
 ```bash
 ./service.sh prep
 ```
 
-### Building the Docker image
+#### Building the Docker image
 
 ```bash
 ./service.sh build [version]
@@ -163,7 +177,7 @@ You can add a specific version number like `v0.0.67` as a second argument
 to build the image based on that version. If not specified it will use
 tip of the main branch.
 
-### Create a configuration file for the Mix server
+#### Create a configuration file for the Mix server
 
 You need to follow the instructions in the Katzenpost
 [Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
@@ -195,7 +209,7 @@ In the `namenlos` repo, change into the `configs` directory and run `make`. Copy
 `<namelos.repo>/configs/<yourname>-pq-mixserver.toml` to `conf/mix.toml`
 in this repo.
 
-### Generating and extracting keys
+#### Generating and extracting keys for the mix node
 
 Run the server to generate the keys:
 
@@ -208,7 +222,7 @@ copy the public identity key `data/identity.public.pem` to the
 `namenlos` repo as
 `<namelos.repo>/keys/mixserver-keys/<yourname>_mix_id_pub_key.pem`.
 
-### Update the 'namenlos' repo
+#### Update the 'namenlos' repo
 
 ```bash
 cd <namenlos.repo>/configs
@@ -221,7 +235,7 @@ Ask a Katzenpost maintainer to add your mix to the mixnet topology.
 Your Mix node will be added to the live network as soon as directory
 authority servers will refresh their configuration to include your mix.
 
-### Starting/stopping the server
+#### Starting/stopping the mix server
 
 ```bash
 ./service.sh start [ListenAddr]
@@ -235,19 +249,33 @@ Starting the server will begin to show the log output from the running service;
 you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
 
-## Directory Authority server
+### Directory Authority server
 
 ```bash
 cd authority
 ```
 
-### Preparing the host filesystem
+#### Customizing the the dirauth service parameters
+
+You can customize the service parameters at the beginning of `service.sh`:
+
+```bash
+NAME=katzenpost/authority
+CNT=kp-dirauth
+LISTEN=${2:-0.0.0.0:28181}
+```
+
+* `NAME` is the name of the generated Docker image
+* `CNT` is the name for the running container
+* `LISTEN` is the bind address the service will listen at
+
+#### Preparing the host filesystem for dirauth
 
 ```bash
 ./service.sh prep
 ```
 
-### Building the Docker image
+#### Building the Docker image for dirauth
 
 ```bash
 ./service.sh build [version]
@@ -257,7 +285,7 @@ You can add a specific version number like `v0.0.67` as a second argument
 to build the image based on that version. If not specified it will use
 tip of the main branch.
 
-### Create a configuration file for the DirAuth server
+#### Create a configuration file for the DirAuth server
 
 You need to follow the instructions in the Katzenpost
 [Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
@@ -303,7 +331,7 @@ Copy the generated configuration file
 `<namelos.repo>/configs/<yourname>-pq-authority.toml` to
 `conf/authority.toml` in this repo.
 
-### Generating and extracting keys
+#### Generating and extracting keys for dirauth
 
 Run the server to generate the keys:
 
@@ -315,7 +343,7 @@ Check that keys (`*.pem`) have been created in the `data/` directory.
 Insert the public identity key and the public link key into the empty
 slots in `<namenlos.repo>/configs/SSOT/authorities/<yourname>`.
 
-### Update the 'namenlos' repo
+#### Update the 'namenlos' repo for dirauth
 
 ```bash
 cd <namenlos.repo>/configs
@@ -327,7 +355,7 @@ git push
 Your DirAuth node will be added to the live network as soon as the other
 directory authority servers will refresh their configuration.
 
-### Starting/stopping the server
+#### Starting/stopping the dirauth server
 
 ```bash
 ./service.sh start [ListenAddr]
