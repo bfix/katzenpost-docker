@@ -19,7 +19,7 @@ VERSION=${2:-main}
 case ${CMD} in
     build)
         ./$0 prep
-        ./$0 image
+        ./$0 image ${VERSION}
         ./$0 config
         ;;
     prep)
