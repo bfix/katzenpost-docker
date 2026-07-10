@@ -10,7 +10,7 @@ function run() {
         --name ${CNT} -h ${CNT} \
         -v $(pwd)/conf:/conf \
         -v $(pwd)/data:/var/lib/katzenpost \
-        -v $(pwd)/log:/var/log/katzenpost \
+        -v $(pwd)/logs:/var/log/katzenpost \
         ${NAME} ${EXEC}
 }
 
@@ -23,7 +23,7 @@ case ${CMD} in
         ./$0 config
         ;;
     prep)
-        mkdir -p {conf,data,log}
+        mkdir -p {conf,data,logs}
         chmod 700 data
         ;;
     image)
