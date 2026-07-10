@@ -54,6 +54,20 @@ the problem:
 ./service.sh config           # Creating configuration file
 ```
 
+#### Logging the client daemon
+
+If you need debugging info from a log file, you can change the following section
+in the configuration file `conf/client.toml` to enable logging:
+
+```bash
+[Logging]
+  Disable = false
+  File = "/var/log/katzenpost/kpclient.log"
+  Level = "DEBUG"
+```
+
+**N.B.**: Do **NOT** change anything else in the configuration file!
+
 #### Starting/stopping the daemon
 
 ```bash
@@ -190,7 +204,8 @@ create a configuration file. You also need access to the `namenlos` repo.
 Create a new file named `<yourname>-pq-mixserver.toml` in
 `<namenlos.repo>/configs/SSOT/mixes` based the following template.
 Change `Identifier` (the server name) and the IP/port setting in
-`Addresses` based on your needs:
+`Addresses` based on your needs. If you need logging, set a path for `File`
+in the `[Logging]` section and specify a suitable log level (`DEBUG`,`INFO`,...).
 
 ```toml
 [Server]
@@ -209,7 +224,8 @@ File = ""
 Level = "NOTICE"
 ```
 
-In the `namenlos` repo, change into the `configs` directory and run `make`. Copy the generated configuration file
+In the `namenlos` repo, change into the `configs` directory and run `make`.
+Copy the generated configuration file
 `<namelos.repo>/configs/<yourname>-pq-mixserver.toml` to `conf/mix.toml`
 in this repo.
 
@@ -301,7 +317,8 @@ create a configuration file. You also need access to the `namenlos` repo.
 Create a new file named `<yourname>-pq-authority.toml` in
 `<namenlos.repo>/configs/SSOT/authority_configs` based the following template.
 Change `Identifier` (the server name) and the IP/port setting in
-`Addresses` based on your needs:
+`Addresses` based on your needs. If you need logging, set a path for `File`
+in the `[Logging]` section and specify a suitable log level (`DEBUG`,`INFO`,...).
 
 ```toml
 [Server]
