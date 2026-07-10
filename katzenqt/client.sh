@@ -17,7 +17,7 @@ function run() {
         -v /run/user/$(id -u)/pulse:/run/user/1000/pulse \
         -v $(pwd)/conf:/home/user/katzenqt/config \
         -v $(pwd)/data:/home/user/.local/share/katzenqt \
-        -v $(pwd)/log:/var/log/katzenpost \
+        -v $(pwd)/logs:/var/log/katzenpost \
         -v ${KP_SOCK}:/home/user/katzenqt/kp.sock \
         ${NAME} ${EXEC}
 }
@@ -27,11 +27,11 @@ VERSION=${2:-main}
 case ${CMD} in
     build)
         ./$0 prep
-        ./$0 image
+        ./$0 image ${VERSION}
         ./$0 config
         ;;
     prep)
-        mkdir {conf,data,log}
+        mkdir -p {conf,data,logs}
         chmod 700 data
         ;;
     image)
