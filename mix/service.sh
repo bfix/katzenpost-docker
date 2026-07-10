@@ -28,7 +28,7 @@ case ${CMD} in
         ;;
     genkeys)
         MODE="-ti --rm"
-        EXEC="/usr/bin/server -g"
+        EXEC="/usr/bin/server -f /conf/mix.toml -g"
         run
         ;;
     start)
