@@ -18,11 +18,13 @@ RUN \
     cd katzenpost && \
     git checkout ${VERSION} && \
     go mod tidy && \
-    cd cmd/kpclientd && go build -v
+    cd cmd/kpclientd && go build -v && \
+	cd ../ping && go build -v
 
 FROM debian:trixie AS deploy
 
 COPY --from=builder /go/katzenpost/cmd/kpclientd/kpclientd /usr/bin/kpclientd
+COPY --from=builder /go/katzenpost/cmd/ping/ping /usr/bin/ping
 
 RUN \
 	apt update && \

@@ -33,6 +33,9 @@ case ${CMD} in
         wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/client.toml -O - \
             | sed -e 's%Address = "@katzenpost"%Address = "/var/lib/katzenpost/kp.sock"%' \
             > conf/client.toml
+        wget https://raw.githubusercontent.com/katzenpost/katzenqt/refs/heads/main/config/thinclient.toml -O - \
+            | sed -e 's%Address = "@katzenpost"%Address = "/var/lib/katzenpost/kp.sock"%' \
+            > conf/thinclient.toml
         ;;
     start)
         MODE="-d --restart=unless-stopped"
