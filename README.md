@@ -70,6 +70,10 @@ To follow the log output again use:
 ./service.sh logs
 ```
 
+**N.B.**: If you enable debugging in the configuration, no log output is shown.
+After starting the service, terminate with `^C` and run `tail -f <path-to-logfile>`
+to show the log.
+
 ### KatzenQt chat application
 
 The KatzenQt chat application enables encrypted group chats over the Katzenpost
@@ -249,6 +253,9 @@ Starting the server will begin to show the log output from the running service;
 you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
 
+**N.B.**: If you enable debugging in the configuration, no log output is shown.
+Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
+
 ### Directory Authority server
 
 ```bash
@@ -368,3 +375,6 @@ the listening port matches the value in the `Addresses` configuration.
 Starting the server will begin to show the log output from the running service;
 you can terminate it with `^C` any time. This will only terminate the log
 output but not the service itself. Run `./service.sh stop` to stop the service.
+
+**N.B.**: If you enable debugging in the configuration, no log output is shown.
+Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
