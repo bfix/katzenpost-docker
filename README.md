@@ -82,16 +82,16 @@ cd katzenqt
 ### Building the KatzenQt client
 
 ```bash
-./client.sh build
+./client.sh build [version]
 ```
 
 If the above build fails, you should run the build steps separately to identify
 the problem:
 
 ```bash
-./client.sh prep      # Preparing the host filesystem
-./client.sh image     # Building the Docker image
-./client.sh config    # Creating configuration file
+./client.sh prep             # Preparing the host filesystem
+./client.sh image [version]  # Building the Docker image
+./client.sh config           # Creating configuration file
 ```
 
 ### Running KatzenQt
