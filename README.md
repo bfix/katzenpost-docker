@@ -49,7 +49,7 @@ This repo provides Docker images to run Katzenpost clients (like chat) or servic
 ## Using the Katzenpost chat
 
 If you only want to use the Katzenpost chat client, please read the
-[client documentation](clients.md) for a description.
+[client documentation](clients/README.md) for a description.
 
 ## Running Katzenpost services
 
@@ -85,4 +85,4 @@ Find more information about these node types in the
 [Katzenpost documentation](https://katzenpost.network/docs/).
 
 To build and run Docker images for these services, please read the
-[service documentation](services.md).
+[service documentation](services/README.md).
