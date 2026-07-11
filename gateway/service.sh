@@ -17,7 +17,7 @@ function run() {
 CMD=${1:-start}
 case ${CMD} in
     prep)
-        mkdir {conf,data,logs}
+        mkdir -p {conf,data,logs}
         chmod 700 data
         ;;
     build)

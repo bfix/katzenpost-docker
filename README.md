@@ -23,375 +23,66 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SPDX-License-Identifier: AGPL3.0-or-later
 
-## Katzenpost clients
+## Intro
 
-### Client daemon (kpclientd)
+The [Katzenpost project](https://katzenpost.network/) implements a post-quantum
+mix network to provide anonymous data transfer between users and services. Unlike
+the [Tor network](https://torproject.org) - which is considered "gold standard"
+for anonymity on the internet - Katzenpost aimes to
+*protect your communication against a global passive adversary* (GPA) not just some random
+eavesdropper with limited capabilities. Even an adversary with a huge quantum computer
+would not be able to read the content of the exchanged data because Katzenpost is
+using a (hybrid) post-quantum scheme for encryption and signatures.
 
-To use the Katzenpost network from client applications you first need to run
-a local daemon. The daemon handles the communication with the Katzenpost
-network on behalf of client applications. Clients use Unix sockets or TCP
-ports to talk to the daemon.
+This comes at a cost: To combat traffic/timing correlation attacks (a technique that
+a GPA can use to de-anonymize Tor users) a higher latency (network delay) is required.
+This make Katzenpost likely unsuitable for real-time data exchange but perfect for chat
+or email/file exchange where a 'delay' between sending and receiving a message is not
+critical or not too annoying. Katzenpost has its own chat client that users can use to
+participate anonymously in individual or group chats. It uses some new techniques to
+make sure that the anonymity guarantees of Katzenpost are held - including a formal
+proof of the protocol used.
 
-```bash
-cd kpclientd
-```
+This repo provides Docker images to run Katzenpost clients (like chat) or services
+(mixnet nodes) in Docker containers.
 
-#### Building the client daemon
+## Using the Katzenpost chat
 
-```bash
-./service.sh build [version]
-```
+If you only want to use the Katzenpost chat client, please read the
+[client documentation](clients.md) for a description.
 
-You can add a specific version number like `v0.0.67` as a second argument to
-the build script. If not specified, tip of the main branch will be used.
+## Running Katzenpost services
 
-If the above build fails, you should run the build steps separately to identify
-the problem:
+If you want to support the Katzenpost infrastructure by running Katzenpost mixnet nodes
+on a your own servers, you are encouraged to contact the Katzenpost team first. New
+nodes need to be manually integrated into the network topology after review (and depending
+on need), so discussing with them what type of nodes would be helpful can save a lot of
+time.
 
-```bash
-./service.sh prep             # Preparing the host filesystem
-./service.sh image [version]  # Building the Docker image
-./service.sh config           # Creating configuration file
-```
+There are different types of nodes (like in the Tor network):
 
-#### Logging the client daemon
+* **Directrory Authorities** negotiate a consensus between themselves about the current
+state of the network and distribute this consensus to other nodes. A consensus is
+authorative for all nodes.
 
-If you need debugging info from a log file, you can change the following section
-in the configuration file `conf/client.toml` to enable logging:
+* **Mixes** are the work horses of the network; they mix the actual user traffic to
+provide anonymity. A high-bandwith network connection is mandatory for mixes.
 
-```bash
-[Logging]
-  Disable = false
-  File = "/var/log/katzenpost/kpclient.log"
-  Level = "DEBUG"
-```
+* **Gateways** are the interface between clients on the internet and the Katzenpost
+network. A high-bandwith network connection is also mandatory for gateways.
 
-**N.B.**: Do **NOT** change anything else in the configuration file!
+* **Services** can implement custom services reachable over the Katzenpost network.
 
-#### Starting/stopping the daemon
+While the above services have a counterparts in the Tor network (DirAuth, Node,
+Guards/Exits, Hidden Services), Katzenpost uses additional services:
 
-```bash
-./service.sh (start|stop)
-```
+* **Couriers** are used to handle message exchange between clients that are not 'online'
+at the same time. Currently only used by the Katzenpost chat.
 
-Starting kpclientd will begin to show the log output from the running service;
-you can terminate it with `^C` any time. This will only terminate the log
-output but not the service itself. Run `./service.sh stop` to stop the service.
+* **Storage nodes** are used by couriers to store messages for asynchronous exchange.
 
-To follow the log output again use:
+Find more information about these node types in the
+[Katzenpost documentation](https://katzenpost.network/docs/).
 
-```bash
-./service.sh logs
-```
-
-**N.B.**: If you enable debugging in the configuration, no log output is shown.
-After starting the service, terminate with `^C` and run `tail -f <path-to-logfile>`
-to show the log.
-
-### KatzenQt chat application
-
-The KatzenQt chat application enables encrypted group chats over the Katzenpost
-mixnet. It is currently the only client application available for Katzenpost.
-
-```bash
-cd katzenqt
-```
-
-#### Building the KatzenQt client
-
-```bash
-./client.sh build [version]
-```
-
-If the above build fails, you should run the build steps separately to identify
-the problem:
-
-```bash
-./client.sh prep             # Preparing the host filesystem
-./client.sh image [version]  # Building the Docker image
-./client.sh config           # Creating configuration file
-```
-
-#### Running KatzenQt
-
-**N.B.:** KatzenQt uses Qt6, and using Qt6 within Docker can result in problems
-on certain Nvidia graphic cards. The window for KatzenQt might show up and the
-controls in the systray look and work fine, but no widgets are drawn in the
-window. If you encounter this problem and can solve the issues for your Nvidia
-card, please give a feedback to `ops@cryptonymity.net`.
-
-##### ...in foreground
-
-```bash
-./client.sh run
-```
-
-Starting katzenqt will begin to show the log output from the running service.
-If you terminate the output with `^C`, it will also terminate the client.
-
-##### ... in background
-
-```bash
-./client.sh start
-```
-
-Behaves like the foreground mode, but terminating the log output does not
-terminate the client. If you want to continue show log out (again), use:
-
-```bash
-./client.sh logs
-```
-
-To stop the client, run
-
-```bash
-./client.sh stop
-```
-
-## Katzenpost servers (Mixnet nodes)
-
-### Prerequisites
-
-* Read at least the
-[Admin guide](https://katzenpost.network/docs/admin_guide/)
-to learn about setting up Katzenpost servers.
-
-* Request access to the `namenlos` git repo if you want to run servers
-on the real network.
-
-### Mix server
-
-```bash
-cd mix
-```
-
-#### Customizing the the mix service parameters
-
-You can customize the service parameters at the beginning of `service.sh`:
-
-```bash
-NAME=katzenpost/mix
-CNT=kp-mix
-LISTEN=${2:-0.0.0.0:18181}
-```
-
-* `NAME` is the name of the generated Docker image
-* `CNT` is the name for the running container
-* `LISTEN` is the bind address the service will listen at
-
-#### Preparing the host filesystem
-
-```bash
-./service.sh prep
-```
-
-#### Building the Docker image
-
-```bash
-./service.sh build [version]
-```
-
-You can add a specific version number like `v0.0.67` as a second argument
-to build the image based on that version. If not specified it will use
-tip of the main branch.
-
-#### Create a configuration file for the Mix server
-
-You need to follow the instructions in the Katzenpost
-[Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
-create a configuration file. You also need access to the `namenlos` repo.
-
-Create a new file named `<yourname>-pq-mixserver.toml` in
-`<namenlos.repo>/configs/SSOT/mixes` based the following template.
-Change `Identifier` (the server name) and the IP/port setting in
-`Addresses` based on your needs. If you need logging, set a path for `File`
-in the `[Logging]` section and specify a suitable log level (`DEBUG`,`INFO`,...).
-
-```toml
-[Server]
-Identifier = "<yourname>"
-PKISignatureScheme = "Ed25519 Sphincs+"
-WireKEM = "KYBER768-X25519"
-Addresses = [ "tcp://<public-ip>:<port>" ]
-BindAddresses = [ "tcp://0.0.0.0:8181" ]
-DataDir = "/var/lib/katzenpost"
-IsGatewayNode = false
-IsServiceNode = false
-
-[Logging]
-Disable = false
-File = ""
-Level = "NOTICE"
-```
-
-In the `namenlos` repo, change into the `configs` directory and run `make`.
-Copy the generated configuration file
-`<namelos.repo>/configs/<yourname>-pq-mixserver.toml` to `conf/mix.toml`
-in this repo.
-
-#### Generating and extracting keys for the mix node
-
-Run the server to generate the keys:
-
-```bash
-./service.sh genkeys
-```
-
-Check that keys (`*.pem`) have been created in the `data/` directory and
-copy the public identity key `data/identity.public.pem` to the
-`namenlos` repo as
-`<namelos.repo>/keys/mixserver-keys/<yourname>_mix_id_pub_key.pem`.
-
-#### Update the 'namenlos' repo
-
-```bash
-cd <namenlos.repo>/configs
-make
-git commit -a
-git push
-```
-
-Ask a Katzenpost maintainer to add your mix to the mixnet topology.
-Your Mix node will be added to the live network as soon as directory
-authority servers will refresh their configuration to include your mix.
-
-#### Starting/stopping the mix server
-
-```bash
-./service.sh start [ListenAddr]
-./service.sh stop
-```
-
-If you do not specify a `ListenAddr` it will default to `0.0.0.0:18181`. Make sure
-the listening port matches the value in the `Addresses` configuration.
-
-Starting the server will begin to show the log output from the running service;
-you can terminate it with `^C` any time. This will only terminate the log
-output but not the service itself. Run `./service.sh stop` to stop the service.
-
-**N.B.**: If you enable debugging in the configuration, no log output is shown.
-Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
-
-### Directory Authority server
-
-```bash
-cd authority
-```
-
-#### Customizing the the dirauth service parameters
-
-You can customize the service parameters at the beginning of `service.sh`:
-
-```bash
-NAME=katzenpost/authority
-CNT=kp-dirauth
-LISTEN=${2:-0.0.0.0:28181}
-```
-
-* `NAME` is the name of the generated Docker image
-* `CNT` is the name for the running container
-* `LISTEN` is the bind address the service will listen at
-
-#### Preparing the host filesystem for dirauth
-
-```bash
-./service.sh prep
-```
-
-#### Building the Docker image for dirauth
-
-```bash
-./service.sh build [version]
-```
-
-You can add a specific version number like `v0.0.67` as a second argument
-to build the image based on that version. If not specified it will use
-tip of the main branch.
-
-#### Create a configuration file for the DirAuth server
-
-You need to follow the instructions in the Katzenpost
-[Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
-create a configuration file. You also need access to the `namenlos` repo.
-
-Create a new file named `<yourname>-pq-authority.toml` in
-`<namenlos.repo>/configs/SSOT/authority_configs` based the following template.
-Change `Identifier` (the server name) and the IP/port setting in
-`Addresses` based on your needs. If you need logging, set a path for `File`
-in the `[Logging]` section and specify a suitable log level (`DEBUG`,`INFO`,...).
-
-```toml
-[Server]
-Identifier = "<yourname>"
-PKISignatureScheme = "Ed25519 Sphincs+"
-WireKEM = "KYBER768-X25519"
-Addresses = [ "tcp://<public-ip>:<port>" ]
-BindAddresses = [ "tcp://0.0.0.0:8181" ]
-DataDir = "/var/lib/katzenpost"
-
-[Logging]
-Disable = false
-File = ""
-Level = "NOTICE"
-```
-
-Create a new file named `<yourname>` in `<namenlos.repo>/configs/SSOT/authorities`
-based the following template. Again change `Identifier` (the server name) and
-the IP/port setting in `Addresses` based on your needs; they should match the
-settings in the previous file.
-
-```toml
-Identifier = "<yourname>"
-PKISignatureScheme = "Ed25519 Sphincs+"
-WireKEMScheme = "KYBER768-X25519"
-Addresses = ["tcp://<public-ip>:<port>"]
-BindAddresses = ["tcp://0.0.0.0:8181"]
-IdentityPublicKey = ""
-LinkPublicKey = ""
-```
-
-In the `namenlos` repo, change into the `configs` directory and run `make`.
-Copy the generated configuration file
-`<namelos.repo>/configs/<yourname>-pq-authority.toml` to
-`conf/authority.toml` in this repo.
-
-#### Generating and extracting keys for dirauth
-
-Run the server to generate the keys:
-
-```bash
-./service.sh genkeys
-```
-
-Check that keys (`*.pem`) have been created in the `data/` directory.
-Insert the public identity key and the public link key into the empty
-slots in `<namenlos.repo>/configs/SSOT/authorities/<yourname>`.
-
-#### Update the 'namenlos' repo for dirauth
-
-```bash
-cd <namenlos.repo>/configs
-make
-git commit -a
-git push
-```
-
-Your DirAuth node will be added to the live network as soon as the other
-directory authority servers will refresh their configuration.
-
-#### Starting/stopping the dirauth server
-
-```bash
-./service.sh start [ListenAddr]
-./service.sh stop
-```
-
-If you do not specify a `ListenAddr` it will default to `0.0.0.0:28181`. Make sure
-the listening port matches the value in the `Addresses` configuration.
-
-Starting the server will begin to show the log output from the running service;
-you can terminate it with `^C` any time. This will only terminate the log
-output but not the service itself. Run `./service.sh stop` to stop the service.
-
-**N.B.**: If you enable debugging in the configuration, no log output is shown.
-Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
+To build and run Docker images for these services, please read the
+[service documentation](services.md).

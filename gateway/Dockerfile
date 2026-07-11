@@ -1,8 +1,14 @@
+
+#############################################################
+# Dockerfile to build  >Y< Katzenpost gateway.
+# Copyright (c) 2026-present, Bernd Fix. All rights reserved.
+#############################################################
+
 FROM golang:trixie AS builder
 
 LABEL author="<ops@cryptonymity.net>"
 
-ARG VERSION=v0.0.71
+ARG VERSION=main
 
 RUN \
     cd /go && \
