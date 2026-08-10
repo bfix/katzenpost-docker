@@ -55,4 +55,4 @@ COPY --from=builder /go/katzenpost/build-commit /home/user/build-commit
 USER user
 ENV HOME=/home/user
 
-CMD ["/usr/bin/server","-f","/conf/wauland-pq-servicenode.toml"]
+CMD ["/usr/bin/server","-f","/conf/courier.toml"]

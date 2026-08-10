@@ -92,4 +92,4 @@ COPY --from=builder /go/katzenpost/build-commit /home/user/build-commit
 USER user
 ENV HOME=/home/user
 
-CMD ["/usr/bin/replica","-f","/conf/wauland-pq-storagenode.toml"]
+CMD ["/usr/bin/replica","-f","/conf/replica.toml"]
