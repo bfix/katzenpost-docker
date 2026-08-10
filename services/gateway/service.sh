@@ -4,6 +4,8 @@ NAME=katzenpost/gateway
 CNT=kp-gateway
 LISTEN=${2:-0.0.0.0:28182}
 
+#-----------------------------------------------------------------------
+
 function run() {
     docker run ${MODE} \
         --name ${CNT} -h ${CNT} \
@@ -13,6 +15,8 @@ function run() {
         -v ${pwd}/logs:/var/log/katzenpost \
         ${NAME} ${EXEC}
 }
+
+cd $(dirname "$0")
 
 CMD=${1:-start}
 case ${CMD} in

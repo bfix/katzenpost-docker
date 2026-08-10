@@ -1,10 +1,10 @@
 #!/bin/bash
 
-cd $(dirname "$0")
-
 NAME=katzenpost/authority
 CNT=kp-dirauth
 LISTEN=${2:-0.0.0.0:28181}
+
+#-----------------------------------------------------------------------
 
 function run() {
     docker run ${MODE} \
@@ -15,6 +15,8 @@ function run() {
         -v $(pwd)/logs:/var/log/katzenpost \
         ${NAME} ${EXEC}
 }
+
+cd $(dirname "$0")
 
 CMD=${1:-start}
 case ${CMD} in
