@@ -268,3 +268,129 @@ output but not the service itself. Run `./service.sh stop` to stop the service.
 
 **N.B.**: If you enable debugging in the configuration, no log output is shown.
 Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
+
+## Gateway server
+
+```bash
+cd gateway
+```
+
+### Customizing the the gateway service parameters
+
+You can customize the service parameters at the beginning of `service.sh`:
+
+```bash
+NAME=katzenpost/gateway
+CNT=kp-gateway
+LISTEN=${2:-0.0.0.0:28182}
+```
+
+* `NAME` is the name of the generated Docker image
+* `CNT` is the name for the running container
+* `LISTEN` is the bind address the service will listen at
+
+### Preparing the host filesystem for gateway
+
+```bash
+./service.sh prep
+```
+
+### Building the Docker image for gateway
+
+```bash
+./service.sh build [version]
+```
+
+You can add a specific version number like `v0.0.67` as a second argument
+to build the image based on that version. If not specified it will use
+tip of the main branch.
+
+### Create a configuration file for the gateway server
+
+You need to follow the instructions in the Katzenpost
+[Admin guide](https://katzenpost.network/docs/admin_guide/) on how to
+create a configuration file. You also need access to the `namenlos` repo.
+
+Create a new file named `<yourname>-pq-gatewaynode.toml` in
+`<namenlos.repo>/configs/SSOT/gateway_nodes` based the following template.
+Change `Identifier` (the server name) and the IP/port setting in
+`Addresses` based on your needs. If you need logging, set a path for `File`
+in the `[Logging]` section and specify a suitable log level (`DEBUG`,`INFO`,...).
+
+```toml
+[Server]
+Identifier = "<yourname>gateway"
+PKISignatureScheme = "Ed25519 Sphincs+"
+WireKEM = "KYBER768-X25519"
+Addresses = [ "tcp://<public-ip>:<port>" ]
+BindAddresses = [ "tcp://0.0.0.0:8181" ]
+DataDir = "/var/lib/katzenpost"
+
+[Logging]
+Disable = false
+File = ""
+Level = "NOTICE"
+
+[Gateway]
+  [Gateway.SpoolDB]
+    Backend = "bolt"
+    [Gateway.SpoolDB.Bolt]
+      SpoolDB = "/var/lib/katzenpost/spool.db"
+```
+
+Create a new file named `<yourname>` in `<namenlos.repo>/configs/SSOT/gateway_pins`
+based the following template. Again change `name` (the server name) and
+the IP/port setting in `addresses` based on your needs; they should match the
+settings in the previous file.
+
+```toml
+name="<yourname>gateway"
+idkey="<yourname>_gateway_id_pub_key.pem"
+addresses='[""tcp://<public-ip>:<port>""]'
+```
+
+In the `namenlos` repo, change into the `configs` directory and run `make`.
+Copy the generated configuration file
+`<namelos.repo>/configs/<yourname>-pq-gateway.toml` to
+`conf/gateway.toml` in this repo.
+
+### Generating and extracting keys for gateway
+
+Run the server to generate the keys:
+
+```bash
+./service.sh genkeys
+```
+
+Check that keys (`*.pem`) have been created in the `data/` directory.
+Insert the public identity key and the public link key into the empty
+slots in `<namenlos.repo>/configs/SSOT/gateway/<yourname>`.
+
+### Update the 'namenlos' repo for gateway
+
+```bash
+cd <namenlos.repo>/configs
+make
+git commit -a
+git push
+```
+
+Your gateway node will be added to the live network as soon as the
+directory authority servers will refresh their configuration.
+
+### Starting/stopping the gateway server
+
+```bash
+./service.sh start [ListenAddr]
+./service.sh stop
+```
+
+If you do not specify a `ListenAddr` it will default to `0.0.0.0:28181`. Make sure
+the listening port matches the value in the `Addresses` configuration.
+
+Starting the server will begin to show the log output from the running service;
+you can terminate it with `^C` any time. This will only terminate the log
+output but not the service itself. Run `./service.sh stop` to stop the service.
+
+**N.B.**: If you enable debugging in the configuration, no log output is shown.
+Terminate with `^C` and run `tail -f <path-to-logfile>` to show the log.
