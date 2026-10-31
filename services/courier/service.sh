@@ -1,5 +1,7 @@
 #!/bin/bash
 
+docker=${docker:-docker}
+export PODMAN_USERNS=keep-id
 NAME=kp-courier
 IMG=katzenpost/courier
 LISTEN=0.0.0.0:28183
@@ -7,7 +9,8 @@ LISTEN=0.0.0.0:28183
 #-----------------------------------------------------------------------
 
 function run() {
-    docker run ${MODE} \
+    chmod -R 700 data || return
+    $docker run ${MODE} \
         --name ${NAME} -h ${NAME} \
         -p ${LISTEN}:8181 \
         -v $(pwd)/conf:/conf \
@@ -17,19 +20,20 @@ function run() {
 }
 
 cd $(dirname "$0")
+[ ! -f conf/listen ] || LISTEN=${2:-$(cat conf/listen)}
 
 CMD=${1:-start}
 case ${CMD} in
     prep)
         mkdir -p {conf,data/courier,logs}
-        chmod 700 data
+        chmod -R 700 data
         ;;
     build)
         VER=""
         if [ -n "$2" ]; then
             VER="--build-arg VERSION=$2"
         fi
-        docker build -t ${IMG} --no-cache ${VER} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+        $docker build -t ${IMG} --no-cache ${VER} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
         ;;
     genkeys-link)
         MODE="-ti --rm"
@@ -42,11 +46,11 @@ case ${CMD} in
         run
         ;&
     logs)
-        docker logs -f ${NAME}
+        $docker logs -f ${NAME}
         ;;
     stop)
-        docker stop ${NAME}
-        docker rm ${NAME}
+        $docker stop ${NAME}
+        $docker rm ${NAME}
         ;;
     test)
         MODE="-ti --rm"

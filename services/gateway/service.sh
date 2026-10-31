@@ -1,5 +1,7 @@
 #!/bin/bash
 
+docker=${docker:-docker}
+export PODMAN_USERNS=keep-id
 NAME=katzenpost/gateway
 CNT=kp-gateway
 LISTEN=${2:-0.0.0.0:28182}
@@ -7,7 +9,8 @@ LISTEN=${2:-0.0.0.0:28182}
 #-----------------------------------------------------------------------
 
 function run() {
-    docker run ${MODE} \
+    chmod 700 data || return
+    $docker run ${MODE} \
         --name ${CNT} -h ${CNT} \
         -p ${LISTEN}:8181 \
         -v $(pwd)/conf:/conf \
@@ -17,6 +20,7 @@ function run() {
 }
 
 cd $(dirname "$0")
+[ ! -f conf/listen ] || LISTEN=${2:-$(cat conf/listen)}
 
 CMD=${1:-start}
 case ${CMD} in
@@ -27,7 +31,7 @@ case ${CMD} in
     build)
         VER=""
         [ -n "$2" ] && VERSION="--build-arg VERSION=$2"
-        docker build -t ${NAME} --no-cache ${VER} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
+        $docker build -t ${NAME} --no-cache ${VER} --build-arg uid=$(id -u) --build-arg gid=$(id -g) .
         ;;
     genkeys)
         MODE="-ti --rm"
@@ -40,11 +44,11 @@ case ${CMD} in
         run
         ;&
     logs)
-        docker logs -f ${CNT}
+        $docker logs -f ${CNT}
         ;;
     stop)
-        docker stop ${CNT}
-        docker rm ${CNT}
+        $docker stop ${CNT}
+        $docker rm ${CNT}
         ;;
     test)
         MODE="-ti --rm"

@@ -1,0 +1,35 @@
+name: Service images
+on: [push, pull_request, workflow_dispatch]
+permissions: {contents: read}
+jobs:
+  services:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    strategy:
+      matrix: {engine: [docker, podman]}
+    steps:
+      - uses: actions/checkout@v4
+      - if: matrix.engine == 'podman'
+        run: sudo apt-get update && sudo apt-get install -y podman uidmap slirp4netns
+      - run: |
+          export docker=${{ matrix.engine }}
+          for service in authority mix gateway courier replica; do
+            (cd services/$service && ./service.sh build)
+          done
+          cd services/mix
+          ./service.sh prep
+          ../prepare-kno.sh cryptonymity-pq-mixserver
+          sed -i -E '/BindAddresses/!s#tcp://[^"]+#tcp://127.0.0.1:1#g' conf/mix.toml
+          for pass in 1 2; do
+            ./service.sh start &
+            for attempt in {1..60}; do
+              $docker exec kp-mix bash -c 'exec 3<>/dev/tcp/127.0.0.1/8181' 2>/dev/null && break
+              sleep 1
+            done
+            $docker exec kp-mix bash -c 'exec 3<>/dev/tcp/127.0.0.1/8181'
+            test "$( $docker inspect --format '{{.State.Running}} {{.RestartCount}}' kp-mix )" = 'true 0'
+            test -s data/identity.private.pem
+            find data -type f \( -name '*.pem' -o -name '*.key' \) -print0 | sort -z | xargs -0 sha256sum > "$pass.sha"
+            ./service.sh stop
+          done
+          cmp 1.sha 2.sha

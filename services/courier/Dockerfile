@@ -8,7 +8,7 @@ FROM golang:trixie AS builder
 
 LABEL author="<ops@cryptonymity.net>"
 
-ARG VERSION=v0.0.71
+ARG VERSION=main
 
 RUN \
     cd /go && \
