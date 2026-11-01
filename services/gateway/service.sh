@@ -14,8 +14,8 @@ function run() {
         --name ${CNT} -h ${CNT} \
         -p ${LISTEN}:8181 \
         -v $(pwd)/conf:/conf \
-        -v ${pwd}/data:/var/lib/katzenpost \
-        -v ${pwd}/logs:/var/log/katzenpost \
+        -v $(pwd)/data:/var/lib/katzenpost \
+        -v $(pwd)/logs:/var/log/katzenpost \
         ${NAME} ${EXEC}
 }
 
