@@ -23,6 +23,9 @@ RUN \
 
 FROM debian:trixie AS deploy
 
+RUN apt-get update && apt-get install -y --no-install-recommends adduser && \
+    rm -rf /var/lib/apt/lists/*
+
 
 COPY --from=builder /go/katzenpost/cmd/replica/replica /usr/bin/replica
 COPY --from=builder /go/katzenpost/cmd/genkeypair/genkeypair /usr/bin/genkeypair
